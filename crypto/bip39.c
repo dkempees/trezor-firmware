@@ -191,6 +191,57 @@ int mnemonic_check(const char *mnemonic) {
   return 0;
 }
 
+size_t mnemonic_last_word_candidates(const char *prefix, int indices[8]) {
+  if (prefix == NULL || indices == NULL) {
+    return 0;
+  }
+
+  char phrase[BIP39_MAX_MNEMONIC_LEN + 1];
+  uint8_t bits[33] = {0};
+  uint8_t hash[32] = {0};
+
+  size_t len = strlen(prefix);
+  if (len == 0 || len + 9 > BIP39_MAX_MNEMONIC_LEN) {
+    return 0;
+  }
+  size_t word_count = 1;
+  if (prefix[0] == ' ' || prefix[len - 1] == ' ') {
+    return 0;
+  }
+  for (size_t i = 0; i < len; i++) {
+    if (prefix[i] == ' ') {
+      if (i == 0 || prefix[i - 1] == ' ') {
+        return 0;
+      }
+      word_count++;
+    }
+  }
+  if (word_count != 23) {
+    return 0;
+  }
+
+  memcpy(phrase, prefix, len);
+  memcpy(phrase + len, " abandon", 9);
+
+  if (mnemonic_to_bits(phrase, bits) != 24 * BIP39_BITS_PER_WORD) {
+    memzero(bits, sizeof(bits));
+    memzero(hash, sizeof(hash));
+    memzero(phrase, sizeof(phrase));
+    return 0;
+  }
+
+  for (int i = 0; i < 8; i++) {
+    bits[31] = (bits[31] & 0xF8) | i;
+    sha256_Raw(bits, 32, hash);
+    indices[i] = (i << 8) | hash[0];
+  }
+
+  memzero(bits, sizeof(bits));
+  memzero(hash, sizeof(hash));
+  memzero(phrase, sizeof(phrase));
+  return 8;
+}
+
 // passphrase must be at most 256 characters otherwise it would be truncated
 void mnemonic_to_seed(const char *mnemonic, const char *passphrase,
                       uint8_t seed[512 / 8],

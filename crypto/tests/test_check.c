@@ -7111,6 +7111,61 @@ START_TEST(test_mnemonic_check) {
 }
 END_TEST
 
+START_TEST(test_mnemonic_last_word_candidates) {
+  const char *prefix =
+      "abandon abandon abandon abandon abandon abandon abandon abandon "
+      "abandon abandon abandon abandon abandon abandon abandon abandon "
+      "abandon abandon abandon abandon abandon abandon abandon";
+
+  int indices[8];
+  ck_assert_int_eq(mnemonic_last_word_candidates(prefix, indices), 8);
+
+  found_word art = mnemonic_find_word("art");
+  ck_assert_int_eq(art.length, 3);
+
+  int found_art = 0;
+  for (int i = 0; i < 8; i++) {
+    if (indices[i] == art.index) {
+      found_art = 1;
+    }
+  }
+  ck_assert_int_eq(found_art, 1);
+
+ for (int i = 0; i < 8; i++) {
+    char candidate[BIP39_MAX_MNEMONIC_LEN + 1];
+    snprintf(candidate, sizeof(candidate), "%s %s", prefix,
+             mnemonic_get_word(indices[i]));
+    ck_assert(mnemonic_check(candidate));
+
+    for (int j = 0; j < i; j++) {
+      ck_assert_int_ne(indices[i], indices[j]);
+    }
+  }
+
+  ck_assert_int_eq(mnemonic_last_word_candidates(NULL, indices), 0);
+  ck_assert_int_eq(mnemonic_last_word_candidates("", indices), 0);
+  ck_assert_int_eq(mnemonic_last_word_candidates("abandon", indices), 0);
+  ck_assert_int_eq(mnemonic_last_word_candidates("abandon abandon", indices),
+                   0);
+  ck_assert_int_eq(
+      mnemonic_last_word_candidates(
+          "abandon  abandon abandon abandon abandon abandon "
+          "abandon abandon abandon abandon abandon abandon abandon "
+          "abandon abandon abandon abandon abandon abandon abandon "
+          "abandon abandon",
+          indices),
+      0);
+  ck_assert_int_eq(
+      mnemonic_last_word_candidates(
+          "abandon abandon abandon abandon abandon abandon abandon "
+          "abandon abandon abandon abandon abandon abandon abandon "
+          "abandon abandon abandon abandon abandon abandon abandon "
+          "abandon abandon invalidword",
+          indices),
+      0);
+}
+END_TEST
+
 START_TEST(test_mnemonic_to_bits) {
   static const char *vectors[] = {
       "00000000000000000000000000000000",
@@ -12851,6 +12906,7 @@ Suite *test_suite(void) {
   tc = tcase_create("bip39");
   tcase_add_test(tc, test_mnemonic);
   tcase_add_test(tc, test_mnemonic_check);
+  tcase_add_test(tc, test_mnemonic_last_word_candidates);
   tcase_add_test(tc, test_mnemonic_to_bits);
   tcase_add_test(tc, test_mnemonic_find_word);
   suite_add_tcase(s, tc);

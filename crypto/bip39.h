@@ -48,6 +48,8 @@ void mnemonic_clear(void);
 
 int mnemonic_check(const char *mnemonic);
 
+size_t mnemonic_last_word_candidates(const char *prefix, int indices[8]);
+
 // Returns the number of bits written to `bits`, or 0 if the mnemonic is
 // invalid.
 size_t mnemonic_to_bits(const char *mnemonic, uint8_t *bits);

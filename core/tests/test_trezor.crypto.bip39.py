@@ -163,6 +163,14 @@ class TestCryptoBip39(unittest.TestCase):
         for m in v:
             self.assertEqual(bip39.check(m), True)
 
+    def test_last_word_candidates(self):
+        prefix = " ".join(["abandon"] * 23)
+        candidates = bip39.last_word_candidates(prefix)
+        self.assertEqual(len(candidates), 8)
+        self.assertIn("art", candidates)
+        for word in candidates:
+            self.assertTrue(bip39.check(prefix + " " + word))
+
     def test_check_fail(self):
         v = [
             "above abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",

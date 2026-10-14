@@ -15,6 +15,7 @@ def check(mnemonic: str) -> bool:
     Check whether given mnemonic is valid.
     """
 
+def last_word_candidates(prefix: str) -> list[str]: ...
 
 # upymod/modtrezorcrypto/modtrezorcrypto-bip39.h
 def seed(

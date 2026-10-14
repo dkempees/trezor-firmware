@@ -55,6 +55,45 @@ static mp_obj_t mod_trezorcrypto_bip39_check(mp_obj_t mnemonic) {
   return (text.len > 0 && mnemonic_check(text.buf)) ? mp_const_true
                                                     : mp_const_false;
 }
+
+/// def last_word_candidates(prefix: str) -> list[str]:
+///     """
+///     Return the eight valid BIP39 final-word candidates for a 23-word prefix.
+///     """
+static mp_obj_t mod_trezorcrypto_bip39_last_word_candidates(mp_obj_t prefix_obj) {
+  mp_buffer_info_t prefix = {0};
+  mp_get_buffer_raise(prefix_obj, &prefix, MP_BUFFER_READ);
+
+  if (prefix.len == 0 || prefix.len > BIP39_MAX_MNEMONIC_LEN) {
+    mp_raise_ValueError(MP_ERROR_TEXT("Invalid 23-word prefix"));
+  }
+
+  char prefix_text[BIP39_MAX_MNEMONIC_LEN + 1];
+  memcpy(prefix_text, prefix.buf, prefix.len);
+  prefix_text[prefix.len] = '\0';
+
+  int indices[8];
+  size_t count = mnemonic_last_word_candidates(prefix_text, indices);
+  if (count != 8) {
+    memzero(prefix_text, sizeof(prefix_text));
+    memzero(indices, sizeof(indices));
+    mp_raise_ValueError(MP_ERROR_TEXT("Invalid 23-word prefix"));
+  }
+
+  mp_obj_t result = mp_obj_new_list(0, NULL);
+  for (size_t i = 0; i < count; i++) {
+    const char *word = mnemonic_get_word(indices[i]);
+    mp_obj_list_append(result, mp_obj_new_str(word, strlen(word)));
+  }
+
+  memzero(prefix_text, sizeof(prefix_text));
+  memzero(indices, sizeof(indices));
+  return result;
+}
+static MP_DEFINE_CONST_FUN_OBJ_1(
+    mod_trezorcrypto_bip39_last_word_candidates_obj,
+    mod_trezorcrypto_bip39_last_word_candidates);
+
 static MP_DEFINE_CONST_FUN_OBJ_1(mod_trezorcrypto_bip39_check_obj,
                                  mod_trezorcrypto_bip39_check);
 
@@ -116,6 +155,7 @@ static const mp_rom_map_elem_t mod_trezorcrypto_bip39_globals_table[] = {
     {MP_ROM_QSTR(MP_QSTR_from_data),
      MP_ROM_PTR(&mod_trezorcrypto_bip39_from_data_obj)},
     {MP_ROM_QSTR(MP_QSTR_check), MP_ROM_PTR(&mod_trezorcrypto_bip39_check_obj)},
+    {MP_ROM_QSTR(MP_QSTR_last_word_candidates), MP_ROM_PTR(&mod_trezorcrypto_bip39_last_word_candidates_obj)},
     {MP_ROM_QSTR(MP_QSTR_seed), MP_ROM_PTR(&mod_trezorcrypto_bip39_seed_obj)},
 #if !BITCOIN_ONLY
     {MP_ROM_QSTR(MP_QSTR_mnemonic_to_bits),
