@@ -7120,6 +7120,25 @@ START_TEST(test_mnemonic_last_word_candidates) {
   int indices[8];
   ck_assert_int_eq(mnemonic_last_word_candidates(prefix, indices), 8);
 
+  const char *expected[8] = {
+      "art", "diesel", "false", "kite",
+      "organ", "ready", "surface", "trouble",
+  };
+  int found[8] = {0};
+
+  for (int i = 0; i < 8; i++) {
+    const char *word = mnemonic_get_word(indices[i]);
+    for (int j = 0; j < 8; j++) {
+      if (strcmp(word, expected[j]) == 0) {
+        found[j] = 1;
+      }
+    }
+  }
+
+  for (int i = 0; i < 8; i++) {
+    ck_assert_int_eq(found[i], 1);
+  }
+
   found_word art = mnemonic_find_word("art");
   ck_assert_int_eq(art.length, 3);
 
@@ -7142,6 +7161,23 @@ START_TEST(test_mnemonic_last_word_candidates) {
     }
   }
 
+  // Prefixes must contain exactly 23 words.
+  ck_assert_int_eq(
+      mnemonic_last_word_candidates(
+          "abandon abandon abandon abandon abandon abandon abandon "
+          "abandon abandon abandon abandon abandon abandon abandon "
+          "abandon abandon abandon abandon abandon abandon abandon "
+          "abandon",
+          indices),
+      0);
+  ck_assert_int_eq(
+      mnemonic_last_word_candidates(
+          "abandon abandon abandon abandon abandon abandon abandon "
+          "abandon abandon abandon abandon abandon abandon abandon "
+          "abandon abandon abandon abandon abandon abandon abandon "
+          "abandon abandon abandon",
+          indices),
+      0);
   ck_assert_int_eq(mnemonic_last_word_candidates(NULL, indices), 0);
   ck_assert_int_eq(mnemonic_last_word_candidates("", indices), 0);
   ck_assert_int_eq(mnemonic_last_word_candidates("abandon", indices), 0);

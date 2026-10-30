@@ -61,6 +61,9 @@ static mp_obj_t mod_trezorcrypto_bip39_check(mp_obj_t mnemonic) {
 ///     Return the eight valid BIP39 final-word candidates for a 23-word prefix.
 ///     """
 static mp_obj_t mod_trezorcrypto_bip39_last_word_candidates(mp_obj_t prefix_obj) {
+  if (!mp_obj_is_str(prefix_obj)) {
+    mp_raise_TypeError(MP_ERROR_TEXT("Prefix must be a string"));
+  }
   mp_buffer_info_t prefix = {0};
   mp_get_buffer_raise(prefix_obj, &prefix, MP_BUFFER_READ);
 

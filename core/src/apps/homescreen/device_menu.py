@@ -488,6 +488,11 @@ async def handle_RebootToBootloader() -> None:
     raise RuntimeError
 
 
+async def handle_Bip39LastWordCandidates() -> None:
+    from .bip39_candidates import show_bip39_last_word_candidates
+    await show_bip39_last_word_candidates()
+
+
 async def handle_RefreshMenu() -> None:
     pass
 
@@ -495,6 +500,7 @@ async def handle_RefreshMenu() -> None:
 _MENU_HANDLERS = {
     DeviceMenuResult.Close: handle_Close,
     DeviceMenuResult.ReviewFailedBackup: handle_ReviewFailedBackup,
+    DeviceMenuResult.Bip39LastWordCandidates: handle_Bip39LastWordCandidates,
     DeviceMenuResult.DisconnectDevice: handle_DisconnectDevice,
     DeviceMenuResult.PairDevice: handle_PairDevice,
     DeviceMenuResult.UnpairAllDevices: handle_UnpairAllDevices,

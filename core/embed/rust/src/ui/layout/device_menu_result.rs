@@ -11,6 +11,7 @@ pub enum DeviceMenuMsg {
     Close,
     // Root menu
     ReviewFailedBackup,
+    Bip39LastWordCandidates,
 
     // "Pair & Connect"
     PairDevice,       // pair a new device
@@ -52,6 +53,7 @@ impl DeviceMenuMsg {
         match self {
             Self::Close => Qstr::MP_QSTR_Close,
             Self::ReviewFailedBackup => Qstr::MP_QSTR_ReviewFailedBackup,
+            Self::Bip39LastWordCandidates => Qstr::MP_QSTR_Bip39LastWordCandidates,
             Self::PairDevice => Qstr::MP_QSTR_PairDevice,
             Self::DisconnectDevice => Qstr::MP_QSTR_DisconnectDevice,
             Self::UnpairDevice(_) => Qstr::MP_QSTR_UnpairDevice,
@@ -103,6 +105,7 @@ unsafe extern "C" fn device_menu_result_attr(_self_in: Obj, attr: ffi::qstr, des
         let msg = match attr {
             Qstr::MP_QSTR_Close => Qstr::MP_QSTR_Close,
             Qstr::MP_QSTR_ReviewFailedBackup => Qstr::MP_QSTR_ReviewFailedBackup,
+            Qstr::MP_QSTR_Bip39LastWordCandidates => Qstr::MP_QSTR_Bip39LastWordCandidates,
             Qstr::MP_QSTR_PairDevice => Qstr::MP_QSTR_PairDevice,
             Qstr::MP_QSTR_DisconnectDevice => Qstr::MP_QSTR_DisconnectDevice,
             Qstr::MP_QSTR_UnpairDevice => Qstr::MP_QSTR_UnpairDevice,

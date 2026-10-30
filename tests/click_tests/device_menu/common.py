@@ -152,6 +152,7 @@ class Menu(Enum):
         def root_content():
             content: list[str] = []
             if initialized:
+                content.append("BIP39 candidates")
                 if unfinished_backup:
                     content.append(TR.homescreen__title_backup_failed)
                 if needs_backup:

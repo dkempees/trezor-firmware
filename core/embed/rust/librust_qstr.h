@@ -23,6 +23,7 @@ static void _librust_qstrs(void) {
   MP_QSTR_BACK;
   MP_QSTR_BLEIF;
   MP_QSTR_BacklightLevels;
+  MP_QSTR_Bip39LastWordCandidates;
   MP_QSTR_CANCELLED;
   MP_QSTR_CONFIRMED;
   MP_QSTR_CheckBackup;

@@ -67,6 +67,7 @@ impl DeviceMenuScreen {
         match msg {
             DeviceMenuMsg::Close => DeviceMenuId::Root,
             DeviceMenuMsg::ReviewFailedBackup => DeviceMenuId::Root,
+            DeviceMenuMsg::Bip39LastWordCandidates => DeviceMenuId::Root,
             DeviceMenuMsg::PairDevice => DeviceMenuId::PairAndConnect,
             DeviceMenuMsg::DisconnectDevice => DeviceMenuId::PairAndConnect,
             DeviceMenuMsg::UnpairDevice(_) => DeviceMenuId::PairAndConnect,
@@ -383,7 +384,13 @@ impl DeviceMenuScreen {
 
         screen.register_pair_and_connect_menu(paired_devices, submenu_indices, connected_idx);
         let pin_unset = pin_enabled == Some(false);
-        screen.register_root_menu(backup_failed, backup_needed, pin_unset, connected_subtext);
+        screen.register_root_menu(
+            backup_failed,
+            backup_needed,
+            pin_unset,
+            pin_enabled.is_some(),
+            connected_subtext,
+        );
 
         // Activate the init submenu
         let init_submenu_id = init_submenu_idx
@@ -701,9 +708,17 @@ impl DeviceMenuScreen {
         backup_failed: bool,
         backup_needed: bool,
         pin_unset: bool,
+        device_initialized: bool,
         connected_subtext: Option<TString<'static>>,
     ) {
         let mut items: Vec<MenuItem, MEDIUM_MENU_ITEMS> = Vec::new();
+
+        if device_initialized {
+            items.add(MenuItem::return_msg(
+                TString::from_str("BIP39 candidates"),
+                DeviceMenuMsg::Bip39LastWordCandidates,
+            ));
+        }
 
         if backup_failed {
             let item = MenuItem::return_msg(

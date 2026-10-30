@@ -170,6 +170,14 @@ class TestCryptoBip39(unittest.TestCase):
         self.assertIn("art", candidates)
         for word in candidates:
             self.assertTrue(bip39.check(prefix + " " + word))
+        with self.assertRaises(TypeError):
+            bip39.last_word_candidates(prefix.encode())
+        with self.assertRaises(ValueError):
+            bip39.last_word_candidates(" ".join(["abandon"] * 22))
+        with self.assertRaises(ValueError):
+            bip39.last_word_candidates(" ".join(["abandon"] * 22 + ["invalidword"]))
+        with self.assertRaises(ValueError):
+            bip39.last_word_candidates("")
 
     def test_check_fail(self):
         v = [
